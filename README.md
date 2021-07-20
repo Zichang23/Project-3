@@ -2,7 +2,7 @@
 
 #### Description of the app and its purpose
 
-#### List of packages need to run the app
+#### List of packages needed to run the app
 
 #### Code to install all the packages used
 
