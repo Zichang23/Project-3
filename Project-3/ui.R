@@ -1,33 +1,47 @@
-#
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+#Project 3
+#Zichang Xiang
 
+#load packages
+library(shinydashboard)
 library(shiny)
 
-# Define UI for application that draws a histogram
-shinyUI(fluidPage(
-
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-            plotOutput("distPlot")
+dashboardPage(
+#    skin = "red",
+    dashboardHeader(title = "Dynamic sidebar"),
+    ## Sidebar content
+    dashboardSidebar(
+        sidebarMenu(
+#            menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+            menuItem("About", tabName = "about", icon = icon("info-circle")),
+            menuItem("Data", tabName = "data", icon = icon("table")),
+            menuItem("Data Exploration", tabName = "explore", icon = icon("bar-chart-o")),
+            menuItem("Modeling", tabName = "model", icon = icon("line-chart", lib = "font-awesome"))
+        )
+#        ,
+#        sidebarMenu(
+#            menuItemOutput("menuitem")
+#        )
+    ),
+    dashboardBody(
+        tabItems(
+            # First tab content
+            tabItem(tabName = "explore",
+                    fluidRow(
+                        box(title = "Controls", 
+                            sliderInput("slider", "Number of observations:", 1, 100, 50)
+                        ),
+                        box(plotOutput("plot1", height = 250))
+                    )
+            ),
+            # Second tab content
+            tabItem(tabName = "about", h2("About page")
+            ),
+            tabItem(tabName = "data", h2("Data page")
+            ),
+            tabItem(tabName = "explore", h2("Data Exploration page")
+            ),
+            tabItem(tabName = "model", h2("Modeling page")
+            )
         )
     )
-))
+)
