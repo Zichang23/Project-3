@@ -3,11 +3,12 @@
 
 #load packages
 library(shinydashboard)
+library(markdown)
 library(shiny)
 
 dashboardPage(
 #    skin = "red",
-    dashboardHeader(title = "Dynamic sidebar"),
+    dashboardHeader(title = "Diabetes Data Analysis"),
     ## Sidebar content
     dashboardSidebar(
         sidebarMenu(
@@ -24,7 +25,23 @@ dashboardPage(
     ),
     dashboardBody(
         tabItems(
-            # First tab content
+            # tab about
+            tabItem(tabName = "about", 
+                    fluidRow(
+                        tabBox(
+                            title = NULL, width = 12,
+                            tabPanel("Application Description",
+                                     includeHTML("About.html")),
+                            tabPanel("Data Description", includeHTML("Data.html"))
+                        )
+                        )
+            ),
+            
+            #tab data
+            tabItem(tabName = "data", h2("Data page")
+            ),
+            
+            #tab explore
             tabItem(tabName = "explore",
                     fluidRow(
                         box(title = "Controls", 
@@ -33,14 +50,18 @@ dashboardPage(
                         box(plotOutput("plot1", height = 250))
                     )
             ),
-            # Second tab content
-            tabItem(tabName = "about", h2("About page")
-            ),
-            tabItem(tabName = "data", h2("Data page")
-            ),
-            tabItem(tabName = "explore", h2("Data Exploration page")
-            ),
-            tabItem(tabName = "model", h2("Modeling page")
+            
+            #tab model
+            tabItem(tabName = "model", 
+                    fluidRow(
+                        tabBox(
+                            title = NULL, width = 12,
+                            tabPanel("Modeling Info", "Modeling Info"),
+                            tabPanel("Model Fitting", "Model Fitting"),
+                            tabPanel("Prediction", "Prediction")
+                        )
+                    )
+            
             )
         )
     )

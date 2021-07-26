@@ -1,0 +1,24 @@
+---
+title: "About"
+author: ""
+date: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Purpose**: this application is aimed to explore the diabetes data and find factors that have great influence on the occurrence of diabetes. 
+
+**Structure**: this shiny app has four pages, including `About`, `Data`, `Data Exploration`, `Modeling`, and `Prediction`.
+
+`About` page: introduces the purpose of the app and each page of the app and discusses the data and its source.
+
+`Data` page: displays the data set used in this app and allows users to subset and save the complete and subsetted data.
+
+`Data Exploration` page: uses data visualization and statistical techniques to find pattern or issues in the data set. 
+
+`Modeling` page: allows users to choose from three different models for fitting and predicting.
+
+
