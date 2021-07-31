@@ -5,13 +5,10 @@ date: ""
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-**Purpose**: this application is aimed to explore the diabetes data and find factors that have great influence on the occurrence of diabetes. 
+**Purpose**: this application is aimed to explore the house price data and find factors that have great influence on the house price. 
 
-**Structure**: this shiny app has four pages, including `About`, `Data`, `Data Exploration`, `Modeling`, and `Prediction`.
+**Structure**: this shiny app has four pages, including `About`, `Data`, `Data Exploration`, and `Modeling`.
 
 `About` page: introduces the purpose of the app and each page of the app and discusses the data and its source.
 

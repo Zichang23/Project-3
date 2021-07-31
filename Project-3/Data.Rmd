@@ -5,37 +5,28 @@ date: ""
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE)
-library(tidyverse)
-library(knitr)
-#Note - to create the PDF I left the same YAML header and just used the knit to PDF menu :)
-```
 
 ### Context
 
-This dataset was downloaded from Kaggle and was originally collected using questionnaires from the patients of Sylhet Diabetes Hospital in Sylhet, Bangladesh, and approved by a doctor. We can find more information here. <https://www.kaggle.com/alakaaay/diabetes-uci-dataset>
+This dataset is a base R dataset, HousePrices. It contains sales prices of houses sold in the city of Windsor, Canada, during July, August and September, 1987. It was originally from Paul Anglin and Ramazan Gencay, "Semiparametric Estimation of a Hedonic Price Function", Journal of Applied Econometrics, Vol. 11, No. 6, 1996, pp. 633-648. We can find more information here. <http://qed.econ.queensu.ca/jae/1996-v11.6/anglin-gencay/>
 
 ### Content
 
-Attribute information:  
-1) Age: 20-65  
-2) Sex: Male/Female  
-3) Polyuria: Yes/No  
-4) Polydipsia: Yes/No  
-5) sudden weight loss: Yes/No  
-6) weakness: Yes/No  
-7) Polyphagia: Yes/No  
-8) Genital thrush: Yes/No  
-9) visual blurring: Yes/No  
-10) Itching: Yes/No  
-11) Irritability: Yes/No  
-12) delayed healing: Yes/No  
-13) partial paresis: Yes/No  
-14) muscle stiffness: Yes/No  
-15) Alopecia: Yes/No  
-16) Obesity: Yes/No  
-17) Class: Positive/Negative  
+**Attribute information:**  
+1) Price: sell price of the house  
+2) Lotsize: lot size  
+3) Bedrooms: number of bedrooms  
+4) Bathrooms: number of bathrooms  
+5) Stories: number of story  
+6) Driveway: does the house have a driveway?  
+7) Recreation: does the house have a recreational room?  
+8) Fullbase: does the house have a full finished basement?  
+9) Gasheat: does the house use gas for hot water heating?  
+10) Aircon: is there central air conditioning?  
+11) Garage: number of garage places  
+12) Prefer: is the house located in the preferred neighborhood of the city?  
+13) [Target] Class: if the sell price is equal to or greater than 50000  
+  
 
 
-![](/Users/zichang/desktop/1.jpeg)
+![](/Users/zichang/desktop/2.jpeg)
