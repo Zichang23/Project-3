@@ -8,12 +8,12 @@ output: html_document
 
 ### Context
 
-This dataset is a base R dataset, HousePrices. It contains sales prices of houses sold in the city of Windsor, Canada, during July, August and September, 1987. It was originally from Paul Anglin and Ramazan Gencay, "Semiparametric Estimation of a Hedonic Price Function", Journal of Applied Econometrics, Vol. 11, No. 6, 1996, pp. 633-648. We can find more information here. <http://qed.econ.queensu.ca/jae/1996-v11.6/anglin-gencay/>
+This dataset is a build-in R data set, HousePrices. It contains sales prices of houses sold in the city of Windsor, Canada, during July, August and September, 1987. It was originally from Paul Anglin and Ramazan Gencay, "Semiparametric Estimation of a Hedonic Price Function", Journal of Applied Econometrics, Vol. 11, No. 6, 1996, pp. 633-648. We can find more information here. <http://qed.econ.queensu.ca/jae/1996-v11.6/anglin-gencay/>
 
 ### Content
 
 **Attribute information:**  
-1) Price: sell price of the house  
+1) [Target] Price: sell price of the house  
 2) Lotsize: lot size  
 3) Bedrooms: number of bedrooms  
 4) Bathrooms: number of bathrooms  
@@ -25,7 +25,6 @@ This dataset is a base R dataset, HousePrices. It contains sales prices of house
 10) Aircon: is there central air conditioning?  
 11) Garage: number of garage places  
 12) Prefer: is the house located in the preferred neighborhood of the city?  
-13) [Target] Class: if the sell price is equal to or greater than 50000  
   
 
 

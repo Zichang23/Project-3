@@ -1,0 +1,258 @@
+---
+title: "Dataset"
+author: ""
+date: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#load packages
+library(tidyverse)
+library(ggcorrplot)
+library(plotly)
+library(caret)
+library(rpart)
+library(tree)
+library(DT)
+```
+
+```{r message=FALSE}
+#read in data and subset data
+car <- read_csv("car.csv")
+car <- as.data.frame(car)
+car <- na.omit(car)
+car$ID <- NULL
+car$Levy <- NULL
+car$Doors <- NULL
+car$`Gear box type` <- NULL
+car$`Drive wheels` <- NULL
+car <- filter(car, `Prod. year` >= 2017)
+car <- gsub("km", "", as.numeric(car$Mileage))
+car$Mileage <- as.numeric(str_remove_all(car$Mileage, " km"))
+car$`Engine volume` <- str_remove_all(car$`Engine volume`, " Turbo")
+car
+
+diabetes <- read_csv("diabetes.csv", row_n)
+diabetes$`Genital thrush` <- NULL
+diabetes$class <- ifelse(diabetes$class=="Positive", 1, 0)
+names(diabetes)
+
+house <- read_csv("house.csv")
+house <- house[,-1]
+house$Class <- as.factor(ifelse(house$price<=50000, "Price <=50000", "Price >50000"))
+house <- rename(house, Price = price, Lotsize = lotsize, Bedrooms=bedrooms, Bathrooms = bathrooms, Stories = stories, Driveway = driveway, Recreation = recreation, Fullbase = fullbase, Gasheat = gasheat, Aircon = aircon, Garage = garage, Prefer = prefer)
+house$Driveway <- as.factor(house$Driveway)
+house$Recreation <- as.factor(house$Recreation)
+house$Fullbase <- as.factor(house$Fullbase)
+house$Gasheat <- as.factor(house$Gasheat)
+house$Aircon <- as.factor(house$Aircon)
+house$Prefer <- as.factor(house$Prefer)
+house
+
+```
+#Data Exploration
+## Categorical Summaries
+```{r}
+a <- table(house$Class)
+prop.table(a)
+b <- table(house$Class, house$Driveway)
+b
+margin.table(b,2)
+boxplot(house$Bedrooms)
+
+      a <- house %>% summarise(Variance = var(house$Bedrooms), Standard_Deviation = sd(house$Bedrooms), 
+                               IQR = IQR(house$Bedrooms), Minimum = min(house$Bedrooms), Maximum = max(house$Bedrooms),
+                               Range = range(house$Bedrooms))
+      a
+```
+
+
+## Categorical Graphs
+```{r}
+#table
+knitr::kable(table(house$Class, house$Driveway))
+
+#bar plot
+g <- ggplot(house, aes(x=Driveway))
+g + geom_bar(aes(fill = Class), position = "dodge") + 
+  labs(x="Driveway", title = paste0("Bar Plot of Driveway by Price"))
+
+g <- ggplot(house, aes(x=Garage))
+g + geom_point(aes(x=Garage, y = Price, color = Class), alpha = 0.6, size = 0.8, position = "jitter") 
+
+#correlation plot 1
+correlation <- cor(house[,1:5])
+corrplot(correlation, type = "upper", tl.pos = "lt")
+corrplot(correlation, type = "lower", method = "number", add = TRUE, diag = FALSE, tl.pos = "n")
+
+#correlation plot 2
+ggcorrplot(correlation, hc.order = TRUE, type = "lower",
+   outline.col = "white",
+   ggtheme = ggplot2::theme_gray
+   )
+
+#boxplot
+g <- ggplot(house, aes(x=Class, y = Lotsize, fill = Class))
+g + geom_boxplot(alpha = 0.3)
+
+# five numbers
+a <- apply(house[,1:5], MARGIN = 2, FUN = fivenum)
+a <- as.data.frame(a)
+rownames(a) <- c("Minimum", "Q1", "Median", "Q3", "Maximum")
+a
+knitr::kable(a)
+
+#mouse input plot
+fig <- house %>% plot_ly(x = ~Class, y = ~Lotsize, type = 'violin', box = list(visible = F), 
+                      meanline = list(visible = T), x0 = 'Class',color = I("#8dd3c7"),
+    marker = list(line = list(width = 2,color = "#8dd3c7"),symbol = 'line-ns')) 
+fig <- fig %>% layout(yaxis = list(title = "", zeroline = F))
+fig
+```
+
+
+# Modeling
+```{r}
+#generalized linear model
+#check for missing values
+anyNA(house)
+
+#split data set into training and test sets
+set.seed(1)
+house <- house[,-13]
+train <- sample(1:nrow(house), size = nrow(house)*0.7)
+test <- dplyr::setdiff(1:nrow(house), train)
+
+train <- house[train, ]
+test <- house[test, ]
+
+train
+test
+```
+
+```{r}
+#fit multiple linear regression model
+# lmFit <- lm(Price ~ ., house)
+# summary(lmFit)
+
+lmFit <- train(Price ~ ., train, method = "lm",
+               preProcess = c("center", "scale"),
+               trControl = trainControl(method = "cv", number = 10))
+
+summary(lmFit)
+
+#RMSE
+a <- sqrt(mean(train$Price - predict(lmFit, train))^2)
+a
+
+b <- sqrt(mean(test$Price - predict(lmFit, test))^2)
+b
+
+#check the fit
+lmPred <- predict(lmFit, newdata = test)
+lmResult <- postResample(lmPred, obs = test$Price)
+
+#calculate RMSE
+lmRMSE <- lmResult[1]
+knitr::kable(lmRMSE)
+
+#prediction
+test_pred <- test[,-1]
+test_pred
+values <- data.frame(Lotsize = 6360,Bedrooms = 1, Bathrooms = 1, Stories = 1, Driveway = "yes", Recreation = "yes", Fullbase = "yes", Gasheat = "yes",
+                             Aircon = "yes", Garage = 1, Prefer = "yes")
+test_pred <- rbind(test_pred, values)
+
+result <- predict(lmFit, newdata = test_pred[nrow(test_pred),])
+result
+```
+```{r}
+#regression tree
+treeFit <- tree(Price ~., data = house)
+summary(treeFit)
+
+result <- predict(treeFit, newdata = test_pred[nrow(test_pred),])
+result
+
+train$Price <- as.factor(train$Price)
+#train$Price <- as.numeric(train$Price)
+set.seed(1)
+rtFit <- train(Price ~ Lotsize + Bedrooms,
+                data = train,
+                method = "rpart",
+                trControl = trainControl(method = "cv", number = 5),
+                preProcess = c("center", "scale")
+               )
+
+rtFit
+#RMSE on training set
+p <- predict(rtFit)
+error <- p-house$Price
+RMSE <- sqrt(mean(error)^2)
+RMSE
+# trainRMSE <- sqrt(mean(train$Price - predict(rfFit, test))^2)
+pred <- predict(rfFit, test)
+rmse(test$Price, pred)
+      #test RMSE
+testRMSE <- sqrt(mean(test$Price - predict(rtFit, test))^2)
+testRMSE
+
+```
+
+```{r}
+#fit a random forest model
+set.seed(1)
+rfFit <- train(Price ~ ., 
+                data = train, 
+                method = "rf",
+                trControl = trainControl(method = "cv", number = 10),
+                preProcess = c("center", "scale"))
+names(rfFit)
+summary(rfFit)
+rfFit$results
+rfFit$finalModel
+library(randomForest)
+
+rfFit <- randomForest(Price ~ . , data = train)
+print(rfFit)
+
+rmse(rfFit, train)
+
+
+result <- predict(rfFit, newdata = test_pred[nrow(test_pred),])
+result
+```
+
+
+```{r}
+rfFit$finalModel
+```
+
+Perform prediction on our test data set  
+```{r}
+#predict using the test set
+rfPred <- predict(rfFit, newdata = test)
+rfResult <- postResample(rfPred, test$Price)
+rfResult <- rfResult[1] %>%  
+#  gather() %>% 
+  knitr::kable()
+rfResult
+```
+
+
+    output$lm <- renderPrint({
+      split <- input$split
+      house <- house[,-13]
+      train <- sample(1:nrow(house), size = nrow(house)*split)
+      test <- dplyr::setdiff(1:nrow(house), train)
+      train <- house[train, ]
+      test <- house[test, ]
+      
+      #fit multiple linear regression model
+      lmFit <- lm(Price ~ ., train)
+      summary(lmFit)
+    })

@@ -1,0 +1,30 @@
+---
+title: ""
+author: ""
+date: ""
+output: html_document
+---
+
+## Multiple Linear Rgression
+
+Multiple linear regression (MLR) is a statistical method that uses multiple variables to predict the outcome of the response variable. In other words, we use MLR to examine the relationship between the predictor variables and the response variable. The model equation is presented below:
+
+
+
+#### Benefits
+
+
+#### Drawbacks:
+
+
+## Regression Tree
+
+#### Benefits
+
+#### Drawbacks:
+
+## Random Forest Model
+
+#### Benefits
+
+#### Drawbacks:
