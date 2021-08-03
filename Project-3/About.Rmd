@@ -8,14 +8,14 @@ output: html_document
 
 **Purpose**: this application is aimed to explore the house price data and find factors that have great influence on the house price. 
 
-**Structure**: this shiny app has four pages, including `About`, `Data`, `Data Exploration`, and `Modeling`.
+**Structure**: this shiny app has four pages, including About, Data, Data Exploration, and Modeling.
 
-`About` page: introduces the purpose of the app and each page of the app and discusses the data and its source.
+**About page**: introduces the purpose of the app and each page of the app and discusses the data and its source.
 
-`Data` page: displays the data set used in this app and allows users to subset and save the complete and subsetted data.
+**Data page**: displays the data set used in this app and allows users to subset and save the complete and subsetted data.
 
-`Data Exploration` page: uses data visualization and statistical techniques to find pattern or issues in the data set. 
+**Data Exploration page**: uses data visualization and statistical techniques to find pattern or issues in the data set. 
 
-`Modeling` page: allows users to choose from three different models for fitting and predicting.
+**Modeling page**: allows users to choose from three different models for fitting and predicting.
 
 

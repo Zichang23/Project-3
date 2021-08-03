@@ -5,22 +5,24 @@
 library(shinydashboard)
 library(randomForest)
 library(ggcorrplot)
-#library(tidyverse)
-library(readr)
 library(ggplot2)
 library(plotly)
 library(GGally)
-library(Metrics)
 library(shiny)
 library(caret)
+library(readr)
+library(tree)
 library(DT)
 
 options(warn = -1)
 
+#read in and manipulate data
 house <- read_csv("house.csv")
 house <- house[,-1]
 house$Class <- as.factor(ifelse(house$price<=50000, "Price <=50000", "Price >50000"))
-house <- rename(house, Price = price, Lotsize = lotsize, Bedrooms=bedrooms, Bathrooms = bathrooms, Stories = stories, Driveway = driveway, Recreation = recreation, Fullbase = fullbase, Gasheat = gasheat, Aircon = aircon, Garage = garage, Prefer = prefer)
+house <- rename(house, Price = price, Lotsize = lotsize, Bedrooms=bedrooms, Bathrooms = bathrooms, 
+                Stories = stories, Driveway = driveway, Recreation = recreation, Fullbase = fullbase, 
+                Gasheat = gasheat, Aircon = aircon, Garage = garage, Prefer = prefer)
 
 dashboardPage(
 #    skin = "red",
@@ -54,13 +56,10 @@ dashboardPage(
                                                    "Recreation", "Fullbase", "Gasheat", "Aircon", "Garage", "Prefer", "Class"),
                                        selected = c("Price", "Lotsize", "Bedrooms", "Bathrooms", "Stories", "Driveway",
                                                     "Recreation", "Fullbase", "Gasheat", "Aircon", "Garage", "Prefer", "Class")),
-                        selectizeInput("row", h4("Select Rows"), selected = "Price >50000", 
-                                       choices = c("Price >50000", "Price <=50000")),
-                        downloadButton('downloadData','Download'),
-                        width = 2),
-                    fluidPage(
-                          column(10,dataTableOutput("table"))
-                        )
+                         h4("Select Rows"),
+                         selectizeInput("row1", "Number of Rows", selected = "10", choices = 1:546),
+                         downloadButton('downloadData','Download'),width = 2),
+                    fluidPage(column(10,dataTableOutput("table")))
             ),
             
             #explore page
@@ -75,15 +74,18 @@ dashboardPage(
                                                                       choices = c("1", "2", "3", "4"))),
                                               column(4, selectizeInput("catsum", "Select Summary", selected = "Frequency", 
                                                               choices = c("Frequency", "Proportion"))),
-                                              column(3, h3("Summary"), tableOutput("cat1")),
+                                              column(3, uiOutput("info1"), tableOutput("cat1")),
                                               column(9, h3("Plot"), plotOutput("catPlot1"), downloadButton('downloadcatPlot1','Download Plot')))),
+                            
                             tabPanel("Quantitative Variables",
                                      fluidPage(
-#                                         column(2, checkboxGroupInput("var1", h4("Select Variables"), 
-#                                                                      choices = c("Price", "Lotsize", "Bedrooms", "Bathrooms", "Stories", "Garage"),
-#                                                                      selected = c("Price", "Lotsize", "Bedrooms", "Bathrooms", "Stories", "Garage"))),
-#                                         column(5,tableOutput("qnt1")),
-#                                         column(5,plotOutput("qntPlot1"),downloadButton('downloadqntPlot1','Download Plot')),
+                                         column(2, checkboxGroupInput("var1", h4("Select Variables"),
+                                                                     choices = c("Price", "Lotsize", "Bedrooms", "Bathrooms", "Stories", "Garage"),
+                                                                     selected = c("Price", "Lotsize", "Bedrooms", "Bathrooms", "Stories", "Garage"))),
+                                         column(5,align = "center", h4("Descriptive Summary Table"), tableOutput("qnt1")),
+                                         column(5,align = "center", h4("Correlation Plot"), plotOutput("qntPlot1"),
+                                                downloadButton('downloadqntPlot1','Download Plot')),
+                                         column(12, br()),
                                          column(3, selectizeInput("qnt", "Select Variable", selected = "Lotsize", 
                                                     choices = c("Lotsize", "Bedrooms", "Bathrooms", "Stories", "Garage"))),
                                          column(3, selectizeInput("qntrow", "Select Prefer", selected = "yes", choices = c("yes", "no"))),
@@ -91,14 +93,12 @@ dashboardPage(
                                                               choices = c("Central Tendency", "Spread"))),
                                          column(3, selectizeInput("qntplot", "Select Plot", selected = "Density Plot", 
                                                               choices = c( "Density Plot", "Scatter Plot"))),
-                                         h3("Summary"),
+                                         uiOutput("info2"),
                                          column(12,tableOutput("qnt2")),
                                          br(),
                                          h3("Plots"),
-                                         column(6, plotlyOutput("qntPlot2"), downloadButton('saveqntPlot2','Download Plot')),
+                                         column(6, plotlyOutput("qntPlot2"), downloadButton('downloadqntPlot2','Download Plot')),
                                          column(6, plotOutput("qntPlot3"), downloadButton('downloadqntPlot3','Download Plot'))
-#                                     ,
-#                                     column(6, plotOutput("qntPlot4"),downloadButton('downloadqntPlot4','Download Plot'))
                                      ))
                         )
                     )
@@ -116,7 +116,7 @@ dashboardPage(
                                          helpText('Multiple linear regression (MLR) is a statistical method that uses multiple variables to 
                                          predict the outcome of the response variable. We use MLR to examine the relationship 
                                          between the predictor variables and the response variable. The model equation is presented below:'),
-                                         helpText('$$y_i = \\beta_0 + \\beta_1 x_{i1} + \\beta_2 x_{i2} + \\cdot +\\beta_px_{ip} + \\epsilon $$'),
+                                         helpText('$$y_i = \\beta_0 + \\beta_1 x_{i1} + \\beta_2 x_{i2} + \\cdots +\\beta_px_{ip} + \\epsilon $$'),
                                          helpText('where, for i = n observations:'),
                                          helpText('\\(y_i\\) = response variable'),
                                          helpText('\\(x_i\\) = predictor variables'),
@@ -165,19 +165,27 @@ dashboardPage(
                                          helpText('\\(f_i\\) is the fitted value'),
                                          helpText('\\(y_i\\) is the actual value for data point i'),
                                          helpText('We use this formula to calculates the distance between each node and the predicted
-                                         value. The closest branch will be the best decision for our forest.'),
+                                                  value. The closest branch will be the best decision for our forest.'),
                                          h4("Benefits:"),
-                                         helpText('1. We reduce overfitting problem and improve the accuracy of our prediction, since we average over multiple
-                                         tree fits and decreases the variance of a single tree fit'),
-                                         helpText('2. Since we use randomly selected subset of predictors, the fitted trees will be less correlated between each
-                                         other, which can help us largely reduce variance from aggregation.'),
+                                         helpText('1. We reduce overfitting problem and improve the accuracy of our prediction, 
+                                                  since we average over multiple tree fits and decreases the variance of a single tree fit'),
+                                         helpText('2. Since we use randomly selected subset of predictors, 
+                                                  the fitted trees will be less correlated between each 
+                                                  other, which can help us largely reduce variance from aggregation.'),
                                          helpText('3. We do not need to consider scale the predictors.'),
                                          helpText('4. The random forest model can missing values automatically.'),
                                          helpText('5. It can be used for both the categorical and continuous response.'),
                                          h4("Drawbacks:"),
                                          helpText('1. The result is usually hard to interpret, because we average over multiple tree fits.'),
-                                         helpText('2. It usually require much more time to train than regression tree, because it generates multiple trees.')
+                                         helpText('2. It usually require much more time to train than regression tree, because it generates multiple trees.'),
+                                         h3("Reference"),
+                                         helpText('1. Adam, H (2021, Mar 30). Multiple Linear Regression (MLR). Investopedia. 
+                                                  https://www.investopedia.com/terms/m/mlr.asp'),
+                                         helpText('2. Jamie, S (2021, August 2) Decision tree learning. Wikipedia. 
+                                                  https://en.wikipedia.org/wiki/Decision_tree_learning'),
+                                         helpText('3. Hooman, M (2021, July 12). Random Forest. Wikipedia. https://en.wikipedia.org/wiki/Random_forest')
                                      )),
+                            
                             tabPanel("Model Fitting", 
                                      fluidRow(column(4, 
                                                      h3("Split Data"),
@@ -199,8 +207,7 @@ dashboardPage(
                                                      h3("Random Forest Model"), verbatimTextOutput("rf", placeholder = TRUE))
                                              )),
                             
-                            tabPanel("Prediction"
-                                     ,
+                            tabPanel("Prediction",
                                      fluidPage(
                                        column(12, 
                                               h3("Select Model"),
@@ -216,10 +223,11 @@ dashboardPage(
                                        column(6, ),
                                        column(12, h3("Numerical Variables")),
                                        column(3, selectInput("lot", "Lotsize", selected = "1650", choices = levels(as.factor(house$Lotsize)))),
-                                       column(3, sliderInput("bedrooms", "Bedrooms", min = 1, max = 6, value = 1, step = 1)),
+                                       column(3, sliderInput("bedrooms", "Bedrooms", min = 1, max = 4, value = 1, step = 1)),
                                        column(3, sliderInput("bathrooms", "Bathrooms", min = 1, max = 4, value = 1, step = 1)),
                                        column(3, sliderInput("stories", "Stories", min = 1, max = 4, value = 1, step = 1)),
                                        column(12, sliderInput("garage", "Garage", min = 0, max = 3, value = 0, step = 1)),
+                                       column(12, numericInput("maxBedrooms", label = "Set Maximum Number of Bedrooms", value = 1, min = 1, max = 6)),
                                        column(12, h3("Prediction Result")),
                                        column(12, h5("House Price:")),
                                        column(3, verbatimTextOutput("value", placeholder = TRUE)),

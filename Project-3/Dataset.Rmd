@@ -188,7 +188,10 @@ rtFit <- train(Price ~ Lotsize + Bedrooms,
                 preProcess = c("center", "scale")
                )
 
-rtFit
+names(rtFit)
+```
+
+```{r}
 #RMSE on training set
 p <- predict(rtFit)
 error <- p-house$Price
@@ -200,7 +203,7 @@ rmse(test$Price, pred)
       #test RMSE
 testRMSE <- sqrt(mean(test$Price - predict(rtFit, test))^2)
 testRMSE
-
+ggplot(varImp(rtFit))
 ```
 
 ```{r}
