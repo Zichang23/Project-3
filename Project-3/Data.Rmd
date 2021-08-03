@@ -27,5 +27,4 @@ This dataset is a build-in R data set, HousePrices. It contains sales prices of 
 12) Prefer: is the house located in the preferred neighborhood of the city?  
   
 
-
-![](/Users/zichang/desktop/2.jpeg)
+![](2.jpeg)
