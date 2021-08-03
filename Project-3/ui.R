@@ -5,6 +5,7 @@
 library(shinydashboard)
 library(randomForest)
 library(ggcorrplot)
+library(webshot)
 library(ggplot2)
 library(plotly)
 library(GGally)

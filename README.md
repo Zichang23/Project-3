@@ -7,10 +7,10 @@ Description: this shiny app is based on shinydashboard. It has four pages, inclu
 Purpose: this application is aimed to explore the house price data and find factors that have great influence on the house price.
 
 #### List of packages needed to run the app
-The packages include `shiny`, `shinydashboard`, `readr`, `ggcorrplot`, `ggplot2`, `GGally`, `plotly`, `caret`, `webshot`, `PhantomJS`, `tree`, and `DT`.
+The packages include `shiny`, `shinydashboard`, `randomForest`, `readr`, `ggcorrplot`, `ggplot2`, `GGally`, `plotly`, `caret`, `webshot`, `PhantomJS`, `tree`, and `DT`.
 
 #### Code to install all the packages used
-`install.packages(c("shiny", "shinydashboard", "readr", "ggcorrplot", "ggplot2", "GGally",  "plotly", "caret", "webshot", "tree", "DT"))`
+`install.packages(c("shiny", "shinydashboard", "randomForest", "readr", "ggcorrplot", "ggplot2", "GGally",  "plotly", "caret", "webshot", "tree", "DT"))`
 
 `webshot::install_phantomjs()`
 
